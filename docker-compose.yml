@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  notificador-suporte-bot:
+    build: .
+    container_name: notificador-suporte-bot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
