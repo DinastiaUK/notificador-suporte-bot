@@ -56,11 +56,12 @@ client.on('voiceStateUpdate', (oldState, newState) => {
       // Tenta enviar a notificação para o n8n
       try {
         const userInfo = {
-          userName: member.user.username,
-          userId: member.id,
-          joinedAt: new Date().toISOString(),
-          priority: priorityRole // <-- NOVA INFORMAÇÃO ENVIADA!
-        };
+        displayName: member.displayName,      // O nome de exibição (ex: LeonardoFreire)
+        username: member.user.username,       // O nome de usuário único (ex: .leonardofreire)
+        userId: member.id,
+        joinedAt: new Date().toISOString(),
+        priority: priorityRole
+      };
 
         axios.post(N8N_WEBHOOK_URL, userInfo);
         console.log(`--> Notificação enviada. Prioridade: ${priorityRole}`);
