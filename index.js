@@ -2,6 +2,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const axios = require('axios');
+const { execSync } = require('child_process');
 
 // 2. Suas informações (LEMBRE-SE DE COLOCAR AS SUAS AQUI)
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -23,12 +24,26 @@ const client = new Client({
   ],
 });
 
-// 4. Evento de "pronto"
+// 4. Função para obter o commit atual
+function getCurrentCommit() {
+  try {
+    const commit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8' }).trim();
+    return { commit, branch };
+  } catch (error) {
+    console.warn('Não foi possível obter informações do git:', error.message);
+    return { commit: 'unknown', branch: 'unknown' };
+  }
+}
+
+// 5. Evento de "pronto"
 client.on('ready', () => {
+  const { commit, branch } = getCurrentCommit();
   console.log(`Bot está online como ${client.user.tag}!`);
+  console.log(`Versão atual: ${commit} (branch: ${branch})`);
 });
 
-// 5. O EVENTO PRINCIPAL
+// 6. O EVENTO PRINCIPAL
 client.on('voiceStateUpdate', (oldState, newState) => {
   // Ignora se a ação foi de outro bot
   if (newState.member.user.bot) return;
@@ -97,5 +112,5 @@ client.on('voiceStateUpdate', (oldState, newState) => {
   }
 });
 
-// 6. Login do bot
+// 7. Login do bot
 client.login(BOT_TOKEN);
