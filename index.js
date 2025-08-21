@@ -38,12 +38,24 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
   // LÓGICA DE ENTRADA
   if (userJoined) {
-    console.log(`${newState.member.user.username} entrou. Iniciando timer de 1 minuto...`);
+    console.log(`${newState.member.user.username} entrou. Iniciando timer de 2 minutos...`);
     
     const timer = setTimeout(() => {
       // --- LÓGICA DA NOTIFICAÇÃO COMEÇA AQUI ---
       const member = newState.member;
-      console.log(`-> Timer de ${member.user.username} concluído. Verificando cargos e enviando notificação.`);
+      console.log(`-> Timer de ${member.user.username} concluído. Verificando se ainda está no canal...`);
+      
+      // VERIFICAÇÃO CRÍTICA: Usuário ainda está no canal de suporte?
+      const currentMember = member.guild.members.cache.get(member.id);
+      const stillInSupportChannel = currentMember?.voice?.channelId === VOICE_CHANNEL_ID;
+      
+      if (!stillInSupportChannel) {
+        console.log(`-> ${member.user.username} não está mais no canal de suporte. Notificação cancelada.`);
+        userTimers.delete(member.id);
+        return;
+      }
+      
+      console.log(`-> ${member.user.username} ainda está no canal. Verificando cargos e enviando notificação.`);
       
       // LÓGICA DE PRIORIDADE DE CARGOS
       let priorityRole = 'Reinado'; // Valor padrão
@@ -70,7 +82,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
       }
       
       userTimers.delete(member.id);
-    }, 60000);
+    }, 120000);
 
     userTimers.set(newState.member.id, timer);
   }
